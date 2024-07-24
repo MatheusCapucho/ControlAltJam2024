@@ -12,6 +12,7 @@ public class BoxToHide : MonoBehaviour, IInteractable
     void Start()
     {
         _playerGO = FindObjectOfType<Interactor>().gameObject;
+        gameObject.layer = 8;
     }
 
     public void Interact()
@@ -23,7 +24,7 @@ public class BoxToHide : MonoBehaviour, IInteractable
     {
         _enabled = !_enabled;
 
-        _playerGO.SetActive(_enabled);
+        _playerGO.transform.GetChild(0).gameObject.SetActive(_enabled);
         // trigger animation
         // trigger sound cue
 

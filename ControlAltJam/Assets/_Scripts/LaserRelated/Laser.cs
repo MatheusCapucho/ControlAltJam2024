@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Laser : MonoBehaviour
@@ -17,6 +16,7 @@ public class Laser : MonoBehaviour
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _collider = GetComponent<Collider2D>();
         _enabled = _collider.enabled;
+        gameObject.layer = 6;
     }
 
     public void Toggle()

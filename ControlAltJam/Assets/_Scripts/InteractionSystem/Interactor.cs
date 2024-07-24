@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class Interactor : MonoBehaviour
 {
@@ -9,16 +10,23 @@ public class Interactor : MonoBehaviour
 
     private Collider2D _collider;
 
+    private Inputs _input;
     private void Awake()
     {
         _collider = GetComponent<Collider2D>();
+        _input = new Inputs();
     }
-    void Update()
+    private void OnEnable()
     {
-
+        _input.Enable();
+        _input.Player.Interact.performed += TryToInteract;
     }
 
-    private void TryToInteract()
+    private void OnDisable()
+    {
+        _input.Player.Interact.performed -= TryToInteract;
+    }
+    private void TryToInteract(InputAction.CallbackContext ctx)
     {
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, _interactionRange, _interationMask);
         foreach (var hitCollider in hitColliders)
