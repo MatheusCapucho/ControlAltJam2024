@@ -14,6 +14,9 @@ public class EnemyBehaviour : MonoBehaviour
     private Vector3 _lastPatrolPoint;
     private bool _movingRight = true;
 
+    [SerializeField] private AudioClip _foundPlayer;
+    [SerializeField] private AudioClip _distracted;
+
     private Tween moveTween;
 
     private void Awake()
