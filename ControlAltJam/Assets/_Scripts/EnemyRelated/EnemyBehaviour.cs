@@ -9,6 +9,7 @@ public class EnemyBehaviour : MonoBehaviour
     [SerializeField] private float _movementDuration = 1f;
     [Range(0, 3)][SerializeField] private float _startDelay = .5f;
     [SerializeField] private float _turnDelay = 1f;
+    [SerializeField] private LayerMask _groundMask;
     private Vector3 _movePoint;
     private Vector3 _startingPoint;
     private Vector3 _lastPatrolPoint;
@@ -33,12 +34,23 @@ public class EnemyBehaviour : MonoBehaviour
     private void OnEnable()
     {
         GameEvents.OnPlayerDetected += StopMove;
+        GameEvents.OnEnemyDistracted += EnemyDistracted;
     }
 
     private void OnDisable()
     {
         GameEvents.OnPlayerDetected -= StopMove;
+        GameEvents.OnEnemyDistracted -= EnemyDistracted;
+
     }
+
+    private void EnemyDistracted(float xPos)
+    {
+        transform.DOKill();
+        _movingRight = !_movingRight;
+        MoveEnemyToPebble(xPos, _turnDelay);
+    }
+
 
     private void SetScale()
     {
@@ -51,7 +63,7 @@ public class EnemyBehaviour : MonoBehaviour
         _lastPatrolPoint = new Vector3(xPoint, transform.position.y, transform.position.z);
         moveTween = transform.DOMoveX(xPoint, _movementDuration, false).SetEase(Ease.OutFlash).SetDelay(delay).OnStart(() => SetScale()).OnComplete(() => {
             _movingRight = !_movingRight;
-
+            _moving = true;
             if (_movingRight )
             {
                 MoveEnemy(_movePoint.x, _turnDelay);
@@ -63,8 +75,46 @@ public class EnemyBehaviour : MonoBehaviour
         });
     }
 
-    public void ForceEnemyPosition(float xPosition)
+    private void MoveEnemyToPebble(float xPos, float turnDelay)
     {
+        moveTween = transform.DOMoveX(xPos, _movementDuration, false).SetEase(Ease.OutFlash).SetDelay(turnDelay).OnComplete(() => {
+            _movingRight = !_movingRight;
+            _moving = true;
+            SetScale();
+            if (_movingRight)
+            {
+                MoveEnemy(_movePoint.x, _turnDelay);
+            }
+            else
+            {
+                MoveEnemy(_startingPoint.x, _turnDelay);
+            }
+        });
+    }
+
+    private bool _moving = true;
+    private void Update()
+    {
+        if (!CheckGround() && _moving)
+        {
+            transform.DOKill();
+            _moving = false;
+            if (_movingRight)
+            {
+                MoveEnemy(_movePoint.x, _turnDelay);
+            }
+            else
+            {
+                MoveEnemy(_startingPoint.x, _turnDelay);
+            }
+        }
+    }
+
+    private bool CheckGround()
+    {
+        var hit = Physics2D.Raycast(transform.position, Vector2.down, 1f, _groundMask);
+
+        return hit ? true : false;
 
     }
 
