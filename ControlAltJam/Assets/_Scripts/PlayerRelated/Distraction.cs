@@ -10,13 +10,15 @@ public class Distraction : MonoBehaviour
 
     private Vector2 _mousePosition;
     private Camera _camera;
+    private SpriteRenderer _spriteRenderer;
 
-    private bool _hasPebble;
+    [SerializeField] private GameObject _pebblePrefab;
 
     private void Awake()
     {
         _input = new Inputs();
         _camera = Camera.main;
+        _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     private void OnEnable()
@@ -24,6 +26,7 @@ public class Distraction : MonoBehaviour
         _input.Enable();
         _input.Player.MouseMove.performed += OnMouseMove;
         _input.Player.MouseInteract.performed += OnTriggerDistraction;
+        GameEvents.OnGetPebble += GetPebbleLogic;
 
 
     }
@@ -33,6 +36,7 @@ public class Distraction : MonoBehaviour
         _input.Disable();
         _input.Player.MouseMove.performed -= OnMouseMove;
         _input.Player.MouseInteract.performed -= OnTriggerDistraction;
+        GameEvents.OnGetPebble -= GetPebbleLogic;
 
     }
 
@@ -47,15 +51,16 @@ public class Distraction : MonoBehaviour
     }
     private void OnTriggerDistraction(InputAction.CallbackContext context)
     {
-        if (!_hasPebble)
+        if (!Pebble.HasPebble)
             return;
 
-        _hasPebble = false;
-
+        _spriteRenderer.enabled = false;
+        var clone =Instantiate(_pebblePrefab, transform.GetChild(0).position, transform.rotation);
+        clone.GetComponent<Pebble>().Move();
 
     }
 
-    public void GetPebbleLogic() { _hasPebble = true; }
+    public void GetPebbleLogic() { _spriteRenderer.enabled = true; }
 
 
 }

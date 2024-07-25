@@ -10,5 +10,12 @@ public class EnemyDetection : MonoBehaviour
         {
             GameEvents.OnPlayerDetected?.Invoke();
         }
+        
+        else
+        if (collision.CompareTag("Pebble"))
+        {
+            GameEvents.OnEnemyDistracted?.Invoke(collision.transform.position.x);
+            collision.gameObject.tag = "Untagged";
+        }
     }
 }
